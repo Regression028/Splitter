@@ -125,6 +125,7 @@ object DebtCalculator {
 
                 result.add(
                     SimplifiedDebt(
+
                         fromUserId = debtorId,
                         fromUserName = debtorName,
                         toUserId = creditorId,

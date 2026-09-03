@@ -17,6 +17,7 @@ class SplitterRepository(private val db: SplitterDatabase) {
     val allUsersFlow: Flow<List<User>> = db.userDao().getAllUsersFlow()
     val allGroupsFlow: Flow<List<GroupEntity>> = db.groupDao().getAllGroupsFlow()
     val allExpensesFlow: Flow<List<ExpenseEntity>> = db.expenseDao().getAllExpensesFlow()
+    val allExpenseSplitsFlow: Flow<List<ExpenseSplitEntity>> = db.expenseDao().getAllExpenseSplitsFlow()
     val allSettlementsFlow: Flow<List<SettlementEntity>> = db.settlementDao().getAllSettlementsFlow()
 
     suspend fun getAllUsers(): List<User> = db.userDao().getAllUsers()
@@ -31,7 +32,6 @@ class SplitterRepository(private val db: SplitterDatabase) {
     suspend fun getAllExpenses(): List<ExpenseEntity> = db.expenseDao().getAllExpenses()
     suspend fun getSplitsForExpense(expenseId: String): List<ExpenseSplitEntity> = db.expenseDao().getSplitsForExpense(expenseId)
     suspend fun getAllExpenseSplits(): List<ExpenseSplitEntity> = db.expenseDao().getAllExpenseSplits()
-    fun getAllExpenseSplitsFlow(): Flow<List<ExpenseSplitEntity>> = db.expenseDao().getAllExpenseSplitsFlow()
 
     fun getSettlementsForGroupFlow(groupId: String): Flow<List<SettlementEntity>> = db.settlementDao().getSettlementsForGroupFlow(groupId)
     suspend fun getSettlementsForGroup(groupId: String): List<SettlementEntity> = db.settlementDao().getSettlementsForGroup(groupId)
