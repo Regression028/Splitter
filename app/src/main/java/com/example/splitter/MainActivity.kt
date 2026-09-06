@@ -18,3 +18,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+// so this is the main activity , just wanted to commit
