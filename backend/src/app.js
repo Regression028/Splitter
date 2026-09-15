@@ -27,12 +27,17 @@ app.use('/api', apiLimiter);
 // Mount API Routes
 const authRoutes = require('./routes/authRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const expenseRoutes = require('./routes/expenseRoutes');
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/auth', authRoutes); // Backwards compatibility alias
 
 app.use('/api/v1/groups', groupRoutes);
 app.use('/api/groups', groupRoutes); // Backwards compatibility alias
+
+app.use('/api/v1/groups/:groupId/expenses', expenseRoutes);
+app.use('/api/v1/expenses', expenseRoutes);
+app.use('/api/expenses', expenseRoutes); // Backwards compatibility alias
 
 // Health Check & Welcome Endpoint
 app.get('/health', (req, res) => {
