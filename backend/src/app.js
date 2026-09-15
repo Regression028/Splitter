@@ -42,6 +42,11 @@ app.use('/api/expenses', expenseRoutes); // Backwards compatibility alias
 
 app.use('/api/v1/groups/:groupId/balances', balanceRoutes);
 
+const settlementRoutes = require('./routes/settlementRoutes');
+app.use('/api/v1/groups/:groupId/settlements', settlementRoutes);
+app.use('/api/v1/settlements', settlementRoutes);
+app.use('/api/settlements', settlementRoutes); // Backwards compatibility alias
+
 // Health Check & Welcome Endpoint
 app.get('/health', (req, res) => {
     return ApiResponse.success(res, {
