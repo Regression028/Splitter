@@ -6,18 +6,22 @@ import com.example.splitter.data.model.ExpenseEntity
 import com.example.splitter.data.model.ExpenseSplitEntity
 import com.example.splitter.data.model.GroupEntity
 import com.example.splitter.data.model.SettlementEntity
-import com.example.splitter.data.model.User
 import com.example.splitter.data.repository.SplitterRepository
 import com.example.splitter.domain.DebtCalculator
 import com.example.splitter.domain.GroupSummary
 import com.example.splitter.domain.OverallBalanceSummary
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GroupViewModel(private val repository: SplitterRepository) : ViewModel() {
+@HiltViewModel
+class GroupViewModel @Inject constructor(
+    private val repository: SplitterRepository
+) : ViewModel() {
 
     val currentUserId = repository.CURRENT_USER_ID
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.splitter.data.network.AuthRequest
 import com.example.splitter.data.network.SessionManager
 import com.example.splitter.data.network.SplitterApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +13,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.inject.Inject
 
-class AuthViewModel(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val apiService: SplitterApiService,
     private val sessionManager: SessionManager
 ) : ViewModel() {

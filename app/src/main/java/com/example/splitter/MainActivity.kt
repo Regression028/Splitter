@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.splitter.ui.screens.MainScreen
 import com.example.splitter.ui.theme.SplitterTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,5 +20,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-// so this is the main activity , just wanted to commit

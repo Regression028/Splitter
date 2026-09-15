@@ -6,10 +6,12 @@ import com.example.splitter.data.network.ApiClient
 import com.example.splitter.data.network.SessionManager
 import com.example.splitter.data.network.SplitterApiService
 import com.example.splitter.data.repository.SplitterRepository
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@HiltAndroidApp
 class SplitterApplication : Application() {
 
     lateinit var repository: SplitterRepository

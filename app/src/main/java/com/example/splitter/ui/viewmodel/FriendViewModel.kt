@@ -5,13 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.splitter.data.repository.SplitterRepository
 import com.example.splitter.domain.DebtCalculator
 import com.example.splitter.domain.FriendBalanceSummary
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FriendViewModel(private val repository: SplitterRepository) : ViewModel() {
+@HiltViewModel
+class FriendViewModel @Inject constructor(
+    private val repository: SplitterRepository
+) : ViewModel() {
 
     val currentUserId = repository.CURRENT_USER_ID
 

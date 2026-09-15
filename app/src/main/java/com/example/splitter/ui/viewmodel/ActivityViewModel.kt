@@ -6,10 +6,12 @@ import com.example.splitter.data.model.ExpenseEntity
 import com.example.splitter.data.model.SettlementEntity
 import com.example.splitter.data.model.User
 import com.example.splitter.data.repository.SplitterRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 sealed class ActivityItem {
     abstract val timestamp: Long
@@ -30,7 +32,10 @@ sealed class ActivityItem {
     ) : ActivityItem()
 }
 
-class ActivityViewModel(private val repository: SplitterRepository) : ViewModel() {
+@HiltViewModel
+class ActivityViewModel @Inject constructor(
+    private val repository: SplitterRepository
+) : ViewModel() {
 
     val activityItemsFlow: StateFlow<List<ActivityItem>> = combine(
         repository.allExpensesFlow,

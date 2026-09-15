@@ -5,12 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.splitter.data.model.GroupEntity
 import com.example.splitter.data.model.User
 import com.example.splitter.data.repository.SplitterRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ExpenseViewModel(private val repository: SplitterRepository) : ViewModel() {
+@HiltViewModel
+class ExpenseViewModel @Inject constructor(
+    private val repository: SplitterRepository
+) : ViewModel() {
 
     val currentUserId = repository.CURRENT_USER_ID
 
