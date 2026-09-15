@@ -35,7 +35,12 @@ object ApiClient {
             .writeTimeout(5, TimeUnit.SECONDS)
             .build()
 
-        val baseUrl = sessionManager.getServerUrl()
+        val customUrl = sessionManager.getServerUrl()
+        val baseUrl = if (customUrl.contains("10.0.2.2") || customUrl.contains("localhost")) {
+            com.example.splitter.BuildConfig.BASE_URL
+        } else {
+            customUrl
+        }
 
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)

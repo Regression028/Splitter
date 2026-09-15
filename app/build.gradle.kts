@@ -20,10 +20,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
+        }
         release {
             optimization {
                 enable = false
             }
+            buildConfigField("String", "BASE_URL", "\"https://api.splitter.app/api/v1/\"")
         }
     }
     compileOptions {
@@ -32,6 +36,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
