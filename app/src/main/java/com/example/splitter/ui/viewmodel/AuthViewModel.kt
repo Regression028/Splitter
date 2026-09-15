@@ -2,98 +2,95 @@ package com.example.splitter.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.splitter.data.network.AuthRequest
-import com.example.splitter.data.network.SessionManager
-import com.example.splitter.data.network.SplitterApiService
+import com.example.splitter.domain.model.DomainUser
+import com.example.splitter.domain.repository.AuthRepository
+import com.example.splitter.domain.usecase.auth.LoginUseCase
+import com.example.splitter.domain.usecase.auth.LogoutUseCase
+import com.example.splitter.domain.usecase.auth.RegisterUseCase
+import com.example.splitter.domain.usecase.auth.VerifySessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val apiService: SplitterApiService,
-    private val sessionManager: SessionManager
+    private val loginUseCase: LoginUseCase,
+    private val registerUseCase: RegisterUseCase,
+    private val verifySessionUseCase: VerifySessionUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _isLoggedIn = MutableStateFlow(sessionManager.isLoggedIn())
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+    private val _isLoggedIn = MutableStateFlow(authRepository.isLoggedIn())
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private val _currentUser = MutableStateFlow<DomainUser?>(authRepository.getCurrentUser())
+    val currentUser: StateFlow<DomainUser?> = _currentUser.asStateFlow()
 
     val currentUserEmail: String
-        get() = sessionManager.getUserEmail()
+        get() = authRepository.getCurrentUser()?.email ?: "you@example.com"
 
     val currentUserName: String
-        get() = sessionManager.getUserName()
+        get() = authRepository.getCurrentUser()?.name ?: "You"
+
+    init {
+        verifySession()
+    }
+
+    fun verifySession() {
+        if (!authRepository.isLoggedIn()) return
+        viewModelScope.launch {
+            val result = verifySessionUseCase()
+            if (result.isSuccess) {
+                _currentUser.value = result.getOrNull()
+                _isLoggedIn.value = true
+            } else {
+                _isLoggedIn.value = false
+            }
+        }
+    }
 
     fun login(email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    apiService.login(AuthRequest(email = email, password = password))
-                }
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val body = response.body()!!
-                    body.extractToken()?.let { sessionManager.saveAuthToken(it) }
-                    body.extractUser()?.let {
-                        sessionManager.saveUser(it.id, it.name, it.email, it.avatarColorHex ?: "#10B981")
-                    }
-                    _isLoggedIn.value = true
-                    onSuccess()
-                } else {
-                    val errMsg = response.body()?.getErrorMessage() ?: "Invalid email or password"
-                    onError(errMsg)
-                }
-            } catch (e: SocketTimeoutException) {
-                onError("Server timeout. Is Node.js running on port 8080?")
-            } catch (e: UnknownHostException) {
-                onError("Network error. Cannot reach server.")
-            } catch (e: Exception) {
-                onError("Connection error: ${e.localizedMessage ?: "Could not connect to server"}")
+            val result = loginUseCase(email, password)
+            if (result.isSuccess) {
+                _currentUser.value = result.getOrNull()
+                _isLoggedIn.value = true
+                onSuccess()
+            } else {
+                onError(result.exceptionOrNull()?.localizedMessage ?: "Invalid email or password")
             }
         }
     }
 
     fun register(name: String, email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    apiService.register(AuthRequest(name = name, email = email, password = password))
-                }
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val body = response.body()!!
-                    body.extractToken()?.let { sessionManager.saveAuthToken(it) }
-                    body.extractUser()?.let {
-                        sessionManager.saveUser(it.id, it.name, it.email, it.avatarColorHex ?: "#10B981")
-                    }
-                    _isLoggedIn.value = true
-                    onSuccess()
-                } else {
-                    val errMsg = response.body()?.getErrorMessage() ?: "Registration failed"
-                    onError(errMsg)
-                }
-            } catch (e: SocketTimeoutException) {
-                onError("Server timeout. Is Node.js running on port 8080?")
-            } catch (e: UnknownHostException) {
-                onError("Network error. Cannot reach server.")
-            } catch (e: Exception) {
-                onError("Connection error: ${e.localizedMessage ?: "Could not connect to server"}")
+            val result = registerUseCase(name, email, password)
+            if (result.isSuccess) {
+                _currentUser.value = result.getOrNull()
+                _isLoggedIn.value = true
+                onSuccess()
+            } else {
+                onError(result.exceptionOrNull()?.localizedMessage ?: "Registration failed")
             }
         }
     }
 
     fun loginOfflineDemo() {
-        sessionManager.saveAuthToken("demo_token_offline")
-        sessionManager.saveUser("user_you", "You (Offline)", "you@example.com", "#10B981")
-        _isLoggedIn.value = true
+        viewModelScope.launch {
+            authRepository.login("you@example.com", "password")
+            _isLoggedIn.value = true
+        }
     }
 
     fun logout() {
-        sessionManager.logout()
-        _isLoggedIn.value = false
+        viewModelScope.launch {
+            logoutUseCase()
+            _currentUser.value = null
+            _isLoggedIn.value = false
+        }
     }
 }
