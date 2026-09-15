@@ -24,6 +24,11 @@ app.use(express.json({ limit: '10mb' }));
 // Apply Rate Limiter
 app.use('/api', apiLimiter);
 
+// Mount API Routes
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Backwards compatibility alias
+
 // Health Check & Welcome Endpoint
 app.get('/health', (req, res) => {
     return ApiResponse.success(res, {
