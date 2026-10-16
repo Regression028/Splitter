@@ -108,7 +108,7 @@ fun MainScreen(
                         navController.navigate(NavRoutes.createGroupDetailRoute(groupId))
                     },
                     onAddExpenseClick = {
-                        navController.navigate(NavRoutes.ADD_EXPENSE)
+                        navController.navigate(NavRoutes.createAddExpenseRoute())
                     }
                 )
             }
@@ -117,7 +117,7 @@ fun MainScreen(
                 FriendsScreen(
                     friendViewModel = friendViewModel,
                     onSettleUpClick = {
-                        navController.navigate(NavRoutes.ADD_EXPENSE)
+                        navController.navigate(NavRoutes.createAddExpenseRoute())
                     }
                 )
             }
@@ -127,7 +127,10 @@ fun MainScreen(
             }
 
             composable(NavRoutes.ACCOUNT) {
+                val currentUser by authViewModel.currentUser.collectAsState()
                 AccountScreen(
+                    userName = currentUser?.name ?: authViewModel.currentUserName,
+                    userEmail = currentUser?.email ?: authViewModel.currentUserEmail,
                     groupViewModel = groupViewModel,
                     friendViewModel = friendViewModel,
                     onLogoutClick = { authViewModel.logout() }
@@ -144,7 +147,7 @@ fun MainScreen(
                     groupViewModel = groupViewModel,
                     onBackClick = { navController.popBackStack() },
                     onAddExpenseClick = { id ->
-                        navController.navigate(NavRoutes.ADD_EXPENSE)
+                        navController.navigate(NavRoutes.createAddExpenseRoute(id))
                     },
                     onSettleUpClick = { id ->
                         navController.navigate(NavRoutes.createSettleUpRoute(id))
@@ -152,8 +155,19 @@ fun MainScreen(
                 )
             }
 
-            composable(NavRoutes.ADD_EXPENSE) {
+            composable(
+                route = NavRoutes.ADD_EXPENSE,
+                arguments = listOf(
+                    navArgument("groupId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val groupId = backStackEntry.arguments?.getString("groupId")
                 AddExpenseScreen(
+                    initialGroupId = groupId,
                     expenseViewModel = expenseViewModel,
                     onBackClick = { navController.popBackStack() },
                     onExpenseSaved = { navController.popBackStack() }

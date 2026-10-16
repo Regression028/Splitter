@@ -8,26 +8,20 @@ const UserSchema = new mongoose.Schema(
         name: {
             type: String,
             required: [true, 'Please provide a name'],
-            trim: true,
-            maxlength: [50, 'Name cannot exceed 50 characters']
+            trim: true
         },
         email: {
             type: String,
             required: [true, 'Please provide an email address'],
             unique: true,
             lowercase: true,
-            trim: true,
-            index: true,
-            match: [
-                /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-                'Please provide a valid email address'
-            ]
+            trim: true
         },
         password: {
             type: String,
             required: [true, 'Please provide a password'],
             minlength: [6, 'Password must be at least 6 characters'],
-            select: false // Exclude password from query results by default
+            select: false
         },
         avatarColorHex: {
             type: String,
@@ -43,7 +37,6 @@ const UserSchema = new mongoose.Schema(
     }
 );
 
-// Hash password before saving
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     const salt = await bcrypt.genSalt(10);
@@ -51,12 +44,10 @@ UserSchema.pre('save', async function (next) {
     next();
 });
 
-// Instance Method: Compare input password
-UserSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+UserSchema.methods.comparePassword = function (entered) {
+    return bcrypt.compare(entered, this.password);
 };
 
-// Instance Method: Generate JWT Token
 UserSchema.methods.generateJwtToken = function () {
     return jwt.sign({ id: this._id }, config.jwtSecret, {
         expiresIn: config.jwtExpire

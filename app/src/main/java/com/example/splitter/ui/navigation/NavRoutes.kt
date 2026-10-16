@@ -23,7 +23,8 @@ object NavRoutes {
     const val GROUP_DETAIL = "group_detail/{groupId}"
     fun createGroupDetailRoute(groupId: String) = "group_detail/$groupId"
 
-    const val ADD_EXPENSE = "add_expense"
+    const val ADD_EXPENSE = "add_expense?groupId={groupId}"
+    fun createAddExpenseRoute(groupId: String? = null) = if (groupId.isNullOrBlank()) "add_expense" else "add_expense?groupId=$groupId"
 
     const val SETTLE_UP = "settle_up/{groupId}"
     fun createSettleUpRoute(groupId: String) = "settle_up/$groupId"
